@@ -8,14 +8,13 @@ chrome.tabs.onCreated.addListener(
         let broken = false;
         for (let i = 1; i < tabs.length + 1; i++) {
           await delay((Math.floor(Math.random() * Math.floor(1)) + (1000 * (i - 1))) / 2);
-          if (!confirm("Are you getting distracted?\n\nI've counted " + i.toString() + " tab" + ((i != 1) ? "s" : "") + " now\u2026")) {
+          if (!confirm("Are you getting distracted?\n\nI've counted " + ((tabs.length != 1) ? i.toString() + " of " + tabs.length.toString() + " tabs" : "one tab") + " now\u2026")) {
             chrome.tabs.remove(tab.id);
             broken = true;
+            alert("\nCrisis averted! Get back to work!")
             break
           };
         }
-        await delay(broken ? 0 : 1000);
-        alert(broken ? "\nCrisis averted! Get back to work!" : "I guess you can keep working now\u2026\n\n\u2026But I'll be back!")
       }
     })
   }
