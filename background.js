@@ -5,19 +5,23 @@ chrome.tabs.onCreated.addListener(
   async function(tab) {
     chrome.tabs.query({}, async function(tabs) {
       if (toggle) {
+        let broken = false;
         for (let i = 1; i < tabs.length + 1; i++) {
           await delay((Math.floor(Math.random() * Math.floor(1)) + (1000 * (i - 1))) / 2);
-          alert("Are you getting distracted?\n\nI've counted " + i.toString() + " tab" + ((i != 1) ? "s" : "") + " now\u2026");
+          if (!confirm("Are you getting distracted?\n\nI've counted " + i.toString() + " tab" + ((i != 1) ? "s" : "") + " now\u2026")) {
+            chrome.tabs.remove(tab.id);
+            broken = true;
+            break
+          };
         }
-        await delay(1000);
-        alert("I guess you can keep working now\u2026\n\n\u2026But I'll be back!")
+        await delay(broken ? 0 : 1000);
+        alert(broken ? "\nCrisis averted! Get back to work!" : "I guess you can keep working now\u2026\n\n\u2026But I'll be back!")
       }
     })
   }
 )
 
-var toggle = false;
-chrome.browserAction.onClicked.addListener(function(tab) {
+function toggler (tab) {
   toggle = !toggle;
   if (toggle) {
     chrome.browserAction.setBadgeText({
@@ -33,5 +37,10 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.browserAction.setTitle({
       title: "Turn on the punishment! Bring it on!"
     });
-  }
-});
+	}
+}
+
+chrome.browserAction.onClicked.addListener(toggler);
+
+var toggle = false;
+toggler({});
